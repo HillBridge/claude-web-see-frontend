@@ -22,7 +22,7 @@ export default {
   methods: {
     logout() {
       this.$confirm('确认退出登录？', '提示', { type: 'warning' }).then(() => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('auth-token');
         this.$router.push('/login');
         this.$message({ type: 'success', message: '已退出登录' });
       }).catch(() => {});

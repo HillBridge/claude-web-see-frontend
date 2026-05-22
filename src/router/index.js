@@ -42,7 +42,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isLoggedIn = !!localStorage.getItem('token');
+  const isLoggedIn = !!localStorage.getItem('auth-token');
   if (!to.meta.public && !isLoggedIn) {
     next({ name: 'login' });
   } else if (to.name === 'login' && isLoggedIn) {

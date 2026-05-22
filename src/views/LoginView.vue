@@ -7,30 +7,15 @@
       </div>
       <el-form ref="loginForm" :model="form" :rules="rules" class="login-form" @submit.native.prevent="handleLogin">
         <el-form-item prop="username">
-          <el-input
-            v-model="form.username"
-            placeholder="用户名"
-            prefix-icon="el-icon-user"
-            :disabled="loading"
-          ></el-input>
+          <el-input v-model="form.username" placeholder="用户名" prefix-icon="el-icon-user" :disabled="loading"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-            v-model="form.password"
-            placeholder="密码"
-            prefix-icon="el-icon-lock"
-            show-password
-            :disabled="loading"
-          ></el-input>
+          <el-input v-model="form.password" placeholder="密码" prefix-icon="el-icon-lock" show-password
+            :disabled="loading"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            class="login-btn"
-            :loading="loading"
-            native-type="submit"
-            @click="handleLogin"
-          >登 录</el-button>
+          <el-button type="primary" class="login-btn" :loading="loading" native-type="submit" @click="handleLogin">登
+            录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -44,8 +29,8 @@ export default {
     return {
       loading: false,
       form: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: 'password123'
       },
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -66,7 +51,7 @@ export default {
           .then((res) => res.json())
           .then((data) => {
             if (data.code === 200) {
-              localStorage.setItem('token', data.data?.token || 'logged_in');
+              localStorage.setItem('auth-token', data.data?.token || 'logged_in');
               this.$message({ type: 'success', message: '登录成功，正在跳转…', duration: 1500 });
               setTimeout(() => {
                 this.$router.push('/');
