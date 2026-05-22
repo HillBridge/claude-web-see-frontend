@@ -11,6 +11,12 @@ const routes = [
     meta: { public: true }
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import(/* webpackChunkName: "register" */ '../views/RegisterView.vue'),
+    meta: { public: true }
+  },
+  {
     path: '/',
     name: 'home',
     component: () => import(/* webpackChunkName: "home" */ '../views/HomeView.vue')

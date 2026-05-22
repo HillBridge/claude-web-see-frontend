@@ -18,6 +18,9 @@
             录</el-button>
         </el-form-item>
       </el-form>
+      <div class="form-footer">
+        没有账号？<router-link to="/register">立即注册</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -30,7 +33,7 @@ export default {
       loading: false,
       form: {
         username: 'admin',
-        password: 'password123'
+        password: '123456'
       },
       rules: {
         username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -118,6 +121,22 @@ export default {
       font-size: 16px;
       letter-spacing: 4px;
       margin-top: 4px;
+    }
+  }
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #909399;
+
+  a {
+    color: #409eff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
