@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { IPageResult } from '@/common/interfaces/page-result.interface';
+import { QueryErrorDto } from './dto/query-error.dto';
 
 @Injectable()
 export class ErrorsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: {
-    page?: number;
-    pageSize?: number;
-    apikey?: string;
-    type?: string;
-    startTime?: number;
-    endTime?: number;
-  }) {
+  async findAll(query: QueryErrorDto): Promise<IPageResult<any>> {
     const { page = 1, pageSize = 20, apikey, type, startTime, endTime } = query;
     const skip = (page - 1) * pageSize;
 

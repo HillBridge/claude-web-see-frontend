@@ -1,17 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { IPageResult } from '@/common/interfaces/page-result.interface';
+import { QueryPerformanceDto } from './dto/query-performance.dto';
 
 @Injectable()
 export class PerformanceService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: {
-    page?: number;
-    pageSize?: number;
-    apikey?: string;
-    startTime?: number;
-    endTime?: number;
-  }) {
+  async findAll(query: QueryPerformanceDto): Promise<IPageResult<any>> {
     const { page = 1, pageSize = 20, apikey, startTime, endTime } = query;
     const skip = (page - 1) * pageSize;
 
@@ -24,15 +20,9 @@ export class PerformanceService {
     }
 
     const [list, total] = await Promise.all([
-      this.prisma.performanceReport.findMany({
-        where,
-        skip,
-        take: pageSize,
-        orderBy: { createdAt: 'desc' },
-      }),
+      this.prisma.performanceReport.findMany({ where, skip, take: pageSize, orderBy: { createdAt: 'desc' } }),
       this.prisma.performanceReport.count({ where }),
     ]);
-
     return { list, total, page, pageSize };
   }
 
@@ -40,21 +30,11 @@ export class PerformanceService {
     return this.prisma.performanceReport.findUnique({ where: { id } });
   }
 
-  /** 计算某个项目的性能平均值 */
   async getAvgMetrics(apikey: string) {
-    const result = await this.prisma.performanceReport.aggregate({
+    return this.prisma.performanceReport.aggregate({
       where: { apikey },
-      _avg: {
-        fp: true,
-        fcp: true,
-        lcp: true,
-        fid: true,
-        cls: true,
-        ttfb: true,
-        loadTime: true,
-      },
+      _avg: { fp: true, fcp: true, lcp: true, fid: true, cls: true, ttfb: true, loadTime: true },
       _count: true,
     });
-    return result;
   }
 }

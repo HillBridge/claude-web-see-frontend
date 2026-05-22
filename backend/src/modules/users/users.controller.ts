@@ -7,68 +7,50 @@ import {
   Body,
   ParseIntPipe,
   Query,
-  ForbiddenException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { QueryUserDto } from './dto/query-user.dto';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { Roles } from '@/common/decorators/roles.decorator';
 
 @ApiTags('用户管理')
 @ApiBearerAuth()
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  @ApiOperation({ summary: '获取用户列表 (Admin)' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiOperation({ summary: '用户列表 (Admin)' })
+  @Roles('ADMIN')
   @Get()
-  findAll(
-    @CurrentUser() user: any,
-    @Query('page') page = 1,
-    @Query('pageSize') pageSize = 20,
-  ) {
-    if (user.role !== 'ADMIN') throw new ForbiddenException('无权访问');
-    return this.usersService.findAll(Number(page), Number(pageSize));
+  findAll(@Query() query: QueryUserDto) {
+    return this.usersService.findAll(query);
   }
 
-  @ApiOperation({ summary: '获取用户详情' })
+  @ApiOperation({ summary: '用户详情（本人或 Admin）' })
   @Get(':id')
   findOne(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: any,
   ) {
-    if (user.role !== 'ADMIN' && user.id !== id) {
-      throw new ForbiddenException('无权访问他人信息');
-    }
-    return this.usersService.findById(id);
+    return this.usersService.findOne(id, user);
   }
 
-  @ApiOperation({ summary: '更新用户信息' })
+  @ApiOperation({ summary: '更新用户信息（本人或 Admin）' })
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateUserDto,
     @CurrentUser() user: any,
   ) {
-    if (user.role !== 'ADMIN' && user.id !== id) {
-      throw new ForbiddenException('无权修改他人信息');
-    }
-    // 普通用户不能修改 role
-    if (user.role !== 'ADMIN') {
-      delete dto.role;
-    }
-    return this.usersService.update(id, dto);
+    return this.usersService.update(id, dto, user);
   }
 
   @ApiOperation({ summary: '删除用户 (Admin)' })
+  @Roles('ADMIN')
   @Delete(':id')
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-    @CurrentUser() user: any,
-  ) {
-    if (user.role !== 'ADMIN') throw new ForbiddenException('无权删除用户');
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }
 }

@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { IPageResult } from '@/common/interfaces/page-result.interface';
+import { QueryRecordScreenDto } from './dto/query-record-screen.dto';
 
 @Injectable()
 export class RecordScreenService {
@@ -7,16 +9,10 @@ export class RecordScreenService {
 
   /** 兼容旧接口: 按 recordScreenId 查询 */
   async findByRecordScreenId(recordScreenId: string) {
-    return this.prisma.recordScreen.findMany({
-      where: { recordScreenId },
-    });
+    return this.prisma.recordScreen.findMany({ where: { recordScreenId } });
   }
 
-  async findAll(query: {
-    page?: number;
-    pageSize?: number;
-    apikey?: string;
-  }) {
+  async findAll(query: QueryRecordScreenDto): Promise<IPageResult<any>> {
     const { page = 1, pageSize = 20, apikey } = query;
     const skip = (page - 1) * pageSize;
     const where: any = {};
@@ -29,13 +25,8 @@ export class RecordScreenService {
         take: pageSize,
         // 列表不返回 events 大字段，节省带宽
         select: {
-          id: true,
-          recordScreenId: true,
-          apikey: true,
-          monitorUserId: true,
-          pageUrl: true,
-          time: true,
-          createdAt: true,
+          id: true, recordScreenId: true, apikey: true,
+          monitorUserId: true, pageUrl: true, time: true, createdAt: true,
         },
         orderBy: { createdAt: 'desc' },
       }),

@@ -2,7 +2,7 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
 import { SourceMapService } from './source-map.service';
-import { Public } from '../common/decorators/public.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 
 @ApiTags('SourceMap')
 @Controller()

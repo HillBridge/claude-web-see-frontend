@@ -13,11 +13,11 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger'
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 @ApiTags('项目管理')
 @ApiBearerAuth()
-@Controller('api/projects')
+@Controller('projects')
 export class ProjectsController {
   constructor(private projectsService: ProjectsService) {}
 

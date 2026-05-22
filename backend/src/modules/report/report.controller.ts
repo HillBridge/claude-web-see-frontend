@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ReportService } from './report.service';
 import { ReportDataDto } from './dto/report-data.dto';
-import { Public } from '../common/decorators/public.decorator';
+import { Public } from '@/common/decorators/public.decorator';
 
 @ApiTags('数据上报')
 @Controller()
