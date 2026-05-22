@@ -8,15 +8,15 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { LoggerModule } from './logger/logger.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { ProjectsModule } from './projects/projects.module';
-import { ReportModule } from './report/report.module';
-import { ErrorsModule } from './errors/errors.module';
-import { PerformanceModule } from './performance/performance.module';
-import { RecordScreenModule } from './record-screen/record-screen.module';
-import { WhiteScreenModule } from './white-screen/white-screen.module';
-import { SourceMapModule } from './source-map/source-map.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { ProjectsModule } from './modules/projects/projects.module';
+import { ReportModule } from './modules/report/report.module';
+import { ErrorsModule } from './modules/errors/errors.module';
+import { PerformanceModule } from './modules/performance/performance.module';
+import { RecordScreenModule } from './modules/record-screen/record-screen.module';
+import { WhiteScreenModule } from './modules/white-screen/white-screen.module';
+import { SourceMapModule } from './modules/source-map/source-map.module';
 
 @Module({
   imports: [
