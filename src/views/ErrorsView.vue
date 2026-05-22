@@ -1,7 +1,7 @@
 <template>
   <div class="errors-view">
     <h2 class="page-title">报错统计</h2>
-    <el-table :data="tableData" style="width: 100%">
+    <el-table :data="tableData" v-loading="loading" style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="message" label="报错信息" width="300"></el-table-column>
       <el-table-column prop="pageUrl" label="报错页面"></el-table-column>
@@ -52,6 +52,18 @@
       </el-table-column>
     </el-table>
 
+    <el-pagination
+      style="margin-top: 16px; text-align: right"
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      :page-size="pageSize"
+      :page-sizes="[10, 20, 50, 100]"
+      :current-page="currentPage"
+      @current-change="handlePageChange"
+      @size-change="handleSizeChange"
+    ></el-pagination>
+
     <el-dialog
       :title="dialogTitle"
       :class="{ 'revert-disalog': fullscreen }"
@@ -89,7 +101,11 @@ export default {
       revertdialog: false,
       dialogTitle: '',
       activities: [],
-      tableData: []
+      tableData: [],
+      total: 0,
+      currentPage: 1,
+      pageSize: 20,
+      loading: false
     };
   },
   created() {
@@ -97,13 +113,29 @@ export default {
   },
   methods: {
     getTableData() {
-      setTimeout(() => {
-        fetch('http://localhost:8083/getErrorList')
-          .then((response) => response.json())
-          .then((res) => {
-            this.tableData = res.data.list;
-          });
-      }, 500);
+      this.loading = true;
+      const params = new URLSearchParams({
+        page: this.currentPage,
+        pageSize: this.pageSize
+      });
+      fetch(`http://localhost:8083/getErrorList?${params}`)
+        .then((response) => response.json())
+        .then((res) => {
+          this.tableData = res.data.list;
+          this.total = res.data.total;
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    handlePageChange(page) {
+      this.currentPage = page;
+      this.getTableData();
+    },
+    handleSizeChange(size) {
+      this.pageSize = size;
+      this.currentPage = 1;
+      this.getTableData();
     },
     revertBehavior({ breadcrumbs }) {
       this.dialogTitle = '查看用户行为';
