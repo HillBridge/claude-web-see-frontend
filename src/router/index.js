@@ -5,6 +5,12 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: '/login',
+    name: 'login',
+    component: () => import(/* webpackChunkName: "login" */ '../views/LoginView.vue'),
+    meta: { public: true }
+  },
+  {
     path: '/',
     name: 'home',
     component: () => import(/* webpackChunkName: "home" */ '../views/HomeView.vue')
@@ -33,6 +39,17 @@ const routes = [
 
 const router = new VueRouter({
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('token');
+  if (!to.meta.public && !isLoggedIn) {
+    next({ name: 'login' });
+  } else if (to.name === 'login' && isLoggedIn) {
+    next({ name: 'home' });
+  } else {
+    next();
+  }
 });
 
 export default router;

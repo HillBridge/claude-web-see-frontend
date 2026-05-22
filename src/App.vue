@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="logoHeader">
+    <div v-if="$route.name !== 'login'" class="logoHeader">
       <img class="logo" src="./assets/logo.png" alt="logo" />
       <span class="title">前端监控</span>
       <nav>
@@ -9,12 +9,27 @@
         <router-link to="/performance">性能监控</router-link>
         <router-link to="/test">错误测试</router-link>
       </nav>
+      <el-button class="logout-btn" type="text" icon="el-icon-switch-button" @click="logout">退出</el-button>
     </div>
-    <div class="page-content">
+    <div :class="{ 'page-content': $route.name !== 'login' }">
       <router-view />
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  methods: {
+    logout() {
+      this.$confirm('确认退出登录？', '提示', { type: 'warning' }).then(() => {
+        localStorage.removeItem('token');
+        this.$router.push('/login');
+        this.$message({ type: 'success', message: '已退出登录' });
+      }).catch(() => {});
+    }
+  }
+};
+</script>
 
 <style lang="scss">
 #app {
@@ -49,6 +64,15 @@
     font-weight: bold;
     font-size: 16px;
     flex-shrink: 0;
+  }
+
+  .logout-btn {
+    margin-left: auto;
+    color: #909399;
+
+    &:hover {
+      color: #f56c6c;
+    }
   }
 
   nav {
