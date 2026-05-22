@@ -3,6 +3,7 @@ import { Message } from 'element-ui';
 
 // 找到以.js结尾的fileName
 function matchStr(str) {
+  if (!str) return null;
   if (str.endsWith('.js')) return str.substring(str.lastIndexOf('/') + 1);
 }
 
@@ -23,6 +24,9 @@ function loadSourceMap(fileName) {
 
 export const findCodeBySourceMap = async ({ fileName, line, column }, callback) => {
   console.log('fileName', fileName);
+  if (!fileName) {
+    return Message({ type: 'error', duration: 5000, message: '源码解析失败: 该错误缺少文件信息（fileName 为空）' });
+  }
   let sourceData = await loadSourceMap(fileName);
   if (!sourceData) return;
   let { sourcesContent, sources } = sourceData;

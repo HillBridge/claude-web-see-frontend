@@ -1,312 +1,104 @@
 <template>
-  <div class="home">
-    <el-button type="primary" @click="codeErr">js错误</el-button>
-    <el-button type="success" @click="asyncError">异步错误</el-button>
-    <el-button type="danger" @click="promiseErr">promise错误</el-button>
-    <el-button type="info" @click="xhrError">xhr请求报错</el-button>
-    <el-button type="warning" @click="fetchError">fetch请求报错</el-button>
-    <el-button type="danger" @click="resourceError">加载资源报错</el-button>
-    <p class="error">报错统计</p>
-    <el-table :data="tableData" style="width: 100%">
-      <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="message" label="报错信息" width="300"> </el-table-column>
-      <el-table-column prop="pageUrl" label="报错页面"> </el-table-column>
-      <el-table-column prop="time" label="报错时间" width="150">
-        <template slot-scope="scope">
-          <span>{{ scope.row.time ? format(scope.row.time) : scope.row.date }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="apikey" label="项目编号"> </el-table-column>
-      <el-table-column prop="userId" label="用户id"> </el-table-column>
-      <el-table-column prop="sdkVersion" label="SDK版本"> </el-table-column>
-      <el-table-column prop="deviceInfo" label="浏览器信息">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deviceInfo.browser }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="deviceInfo" label="操作系统">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deviceInfo.os }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="100">
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.type == 'error' || scope.row.type == 'unhandledrejection'" type="primary"
-            @click="revertCode(scope.row)">查看源码</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" prop="recordScreenId" label="播放录屏" width="100">
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.recordScreenId" type="primary"
-            @click="playRecord(scope.row.recordScreenId)">播放录屏</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column fixed="right" prop="breadcrumbs" label="用户行为记录" width="125">
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.breadcrumbs" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen"
-      :visible.sync="revertdialog" width="90%" :destroy-on-close="true">
-      <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
-      <el-timeline v-else>
-        <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
-          :color="activity.color" :timestamp="format(activity.time)">
-          {{ activity.content }}
-        </el-timeline-item>
-      </el-timeline>
-    </el-dialog>
-    <div id="echart" style="width: 400px; height: 300px"></div>
+  <div class="home-view">
+    <h2 class="page-title">前端监控 · 控制台</h2>
+    <el-row :gutter="20" class="cards">
+      <el-col :span="8">
+        <el-card shadow="hover" @click.native="$router.push('/errors')">
+          <div class="card-content">
+            <i class="el-icon-warning-outline card-icon error-icon"></i>
+            <div>
+              <p class="card-label">报错统计</p>
+              <p class="card-desc">查看所有已上报的 JS 错误、Promise 异常等</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover" @click.native="$router.push('/performance')">
+          <div class="card-content">
+            <i class="el-icon-data-line card-icon perf-icon"></i>
+            <div>
+              <p class="card-label">性能监控</p>
+              <p class="card-desc">查看页面性能指标与图表</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="8">
+        <el-card shadow="hover" @click.native="$router.push('/test')">
+          <div class="card-content">
+            <i class="el-icon-magic-stick card-icon test-icon"></i>
+            <div>
+              <p class="card-label">错误测试</p>
+              <p class="card-desc">手动触发各类前端错误以测试 SDK 采集</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
-import { findCodeBySourceMap } from '../utils/sourcemap';
-import { unzip } from '../utils/recordScreen.js';
-import rrwebPlayer from 'rrweb-player';
-import 'rrweb-player/dist/style.css';
-
 export default {
-  name: 'HomeView',
-  data() {
-    return {
-      fullscreen: true,
-      revertdialog: false,
-      dialogTitle: '',
-      activities: [],
-      tableData: []
-    };
-  },
-  created() {
-    this.getTableData();
-  },
-  mounted() {
-    this.myEcharts();
-  },
-  methods: {
-    myEcharts() {
-      // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById('echart'));
-
-      // 指定图表的配置项和数据
-      let option = {
-        animation: false,
-        title: {
-          text: 'ECharts 入门示例'
-        },
-        tooltip: {},
-        legend: {
-          data: ['销量']
-        },
-        xAxis: {
-          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-        },
-        yAxis: {},
-        series: [
-          {
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-          }
-        ]
-      };
-
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option);
-    },
-    getTableData() {
-      setTimeout(() => {
-        fetch(`http://localhost:8083/getErrorList`)
-          .then((response) => response.json())
-          .then((res) => {
-            this.tableData = res.data.list;
-          });
-      }, 500);
-    },
-    fetchError() {
-      fetch('https://jsonplaceholder.typicode.com/posts/a')
-        .then((res) => {
-          if (res.status == 404) {
-            this.getTableData();
-          }
-        })
-        .catch(() => {
-          this.getTableData();
-        });
-    },
-    revertBehavior({ breadcrumbs }) {
-      this.dialogTitle = '查看用户行为';
-      this.fullscreen = false;
-      this.revertdialog = true;
-      breadcrumbs.forEach((item) => {
-        item.color = item.status == 'ok' ? '#5FF713' : '#F70B0B';
-        item.icon = item.status == 'ok' ? 'el-icon-check' : 'el-icon-close';
-        if (item.category == 'Click') {
-          item.content = `用户点击dom: ${item.data}`;
-        } else if (item.category == 'Http') {
-          item.content = `调用接口: ${item.data.url}, ${item.status == 'ok' ? '请求成功' : '请求失败'}`;
-        } else if (item.category == 'Code_Error') {
-          item.content = `代码报错：${item.data.message}`;
-        } else if (item.category == 'Resource_Error') {
-          item.content = `加载资源报错：${item.message}`;
-        } else if (item.category == 'Route') {
-          item.content = `路由变化：从 ${item.data.from}页面 切换到 ${item.data.to}页面`;
-        }
-      });
-      this.activities = breadcrumbs;
-    },
-    revertCode(row) {
-      findCodeBySourceMap(row, (res) => {
-        this.dialogTitle = '查看源码';
-        this.fullscreen = false;
-        this.revertdialog = true;
-        this.$nextTick(() => {
-          this.$refs.revert.innerHTML = res;
-        });
-      });
-    },
-    playRecord(id) {
-      fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
-        .then((response) => response.json())
-        .then((res) => {
-          let { code, data } = res;
-          if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
-            let events = unzip(data[0].events);
-            this.fullscreen = true;
-            this.dialogTitle = '播放录屏';
-            this.revertdialog = true;
-            this.$nextTick(() => {
-              new rrwebPlayer({
-                target: document.getElementById('revert'),
-                props: {
-                  events,
-                  UNSAFE_replayCanvas: true
-                }
-              });
-            });
-          } else {
-            this.$message({
-              message: '暂无数据，请稍后重试~',
-              type: 'warning',
-              duration: 5000
-            });
-          }
-        });
-    },
-    format(time) {
-      let str = new Date(time);
-      return str.toLocaleDateString().replace(/\//g, '-') + ' ' + str.toTimeString().substr(0, 8);
-    },
-    asyncError() {
-      this.getTableData();
-      setTimeout(() => {
-        JSON.parse('');
-      });
-    },
-    codeErr() {
-      this.getTableData();
-      let a = undefined;
-      if (a.length) {
-        console.log('1');
-      }
-    },
-    resourceError() {
-      let script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = 'https://abc.com/index.js';
-      document.body.appendChild(script);
-      // 资源加载失败
-      script.onerror = () => {
-        this.getTableData();
-      };
-    },
-    promiseErr() {
-      new Promise((resolve) => {
-        this.getTableData();
-        let person = {};
-        person.name.age();
-        resolve();
-      });
-    },
-
-    xhrError() {
-      let _this = this;
-      let ajax = new XMLHttpRequest();
-      ajax.open('GET', 'https://abc.com/test/api');
-      ajax.setRequestHeader('content-type', 'application/json');
-      ajax.onreadystatechange = function () {
-        if (ajax.readyState == 4) {
-          _this.getTableData();
-        }
-        if (ajax.status === 200 || ajax.status === 304) {
-          console.log('ajax', ajax);
-        }
-      };
-      ajax.send();
-      ajax.addEventListener('loadend', () => { });
-    }
-  }
+  name: 'HomeView'
 };
 </script>
+
 <style lang="less">
-.error {
-  margin-top: 20px;
-  height: 30px;
-  line-height: 30px;
-  font-weight: 800;
-  background-color: #ebeef5;
-}
+.home-view {
+  padding: 20px 0;
 
-.el-row {
-  text-align: left;
-  margin-bottom: 10px;
-}
-
-.el-dialog__header {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.el-timeline {
-  text-align: left;
-
-  .el-timeline-item__icon {
-    font-size: 12px;
+  .page-title {
+    text-align: left;
+    margin-bottom: 24px;
+    font-size: 22px;
+    font-weight: 700;
   }
-}
 
-.revert-disalog {
-  .el-dialog__body {
-    height: 720px;
+  .cards {
+    .el-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: translateY(-4px);
+      }
+    }
+
+    .card-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .card-icon {
+      font-size: 36px;
+    }
+
+    .error-icon {
+      color: #f56c6c;
+    }
+
+    .perf-icon {
+      color: #409eff;
+    }
+
+    .test-icon {
+      color: #67c23a;
+    }
+
+    .card-label {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #888;
+    }
   }
-}
-
-.rr-player {
-  margin: 0 auto;
-}
-
-#revert {
-  width: 100%;
-  display: flex;
-}
-
-.errdetail {
-  text-align: left;
-  width: 100%;
-  font-size: 16px;
-}
-
-.code-line {
-  padding: 5px 0;
-}
-
-.heightlight {
-  background-color: yellowgreen;
-}
-
-.errheader {
-  padding: 10px;
-  border-bottom: 1px solid rgb(214, 210, 210);
 }
 </style>
