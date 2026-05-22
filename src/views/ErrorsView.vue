@@ -90,6 +90,7 @@
 <script>
 import { findCodeBySourceMap } from '../utils/sourcemap';
 import { unzip } from '../utils/recordScreen.js';
+import request from '../utils/request';
 import rrwebPlayer from 'rrweb-player';
 import 'rrweb-player/dist/style.css';
 
@@ -118,8 +119,8 @@ export default {
         page: this.currentPage,
         pageSize: this.pageSize
       });
-      fetch(`http://localhost:8083/getErrorList?${params}`)
-        .then((response) => response.json())
+      request
+        .get(`/getErrorList?${params}`)
         .then((res) => {
           this.tableData = res.data.list;
           this.total = res.data.total;
@@ -169,9 +170,7 @@ export default {
       });
     },
     playRecord(id) {
-      fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
-        .then((response) => response.json())
-        .then((res) => {
+      request.get(`/getRecordScreenId?id=${id}`).then((res) => {
           let { code, data } = res;
           if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
             let events = unzip(data[0].events);

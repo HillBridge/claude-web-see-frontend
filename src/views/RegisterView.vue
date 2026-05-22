@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import request from '../utils/request';
+
 export default {
   name: 'RegisterView',
   data() {
@@ -70,16 +72,12 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (!valid) return;
         this.loading = true;
-        fetch('http://localhost:8083/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        request
+          .post('/api/auth/register', {
             username: this.form.username,
             email: this.form.email,
             password: this.form.password
           })
-        })
-          .then((res) => res.json())
           .then((data) => {
             if (data.code === 200) {
               this.$message({ type: 'success', message: '注册成功，请登录', duration: 1500 });

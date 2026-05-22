@@ -13,6 +13,7 @@
     "@websee/core": "^4.0.2",
     "@websee/performance": "^4.0.2",
     "@websee/recordscreen": "^4.0.2",
+    "axios": "^1.16.1",
     "body-parser": "^1.20.1",
     "co-body": "^6.1.0",
     "concurrently": "^7.6.0",

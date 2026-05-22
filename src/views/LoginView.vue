@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import request from '../utils/request';
+
 export default {
   name: 'LoginView',
   data() {
@@ -46,15 +48,11 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (!valid) return;
         this.loading = true;
-        fetch('http://localhost:8083/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.form.username, password: this.form.password })
-        })
-          .then((res) => res.json())
+        request
+          .post('/api/auth/login', { username: this.form.username, password: this.form.password })
           .then((data) => {
             if (data.code === 200) {
-              localStorage.setItem('auth-token', data.data?.token || 'logged_in');
+              localStorage.setItem('auth-token', data.data?.accessToken || 'logged_in');
               this.$message({ type: 'success', message: '登录成功，正在跳转…', duration: 1500 });
               setTimeout(() => {
                 this.$router.push('/');
