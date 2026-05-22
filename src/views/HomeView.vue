@@ -31,24 +31,28 @@
       </el-table-column>
       <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="100">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.type == 'error' || scope.row.type == 'unhandledrejection'" type="primary" @click="revertCode(scope.row)">查看源码</el-button>
+          <el-button v-if="scope.row.type == 'error' || scope.row.type == 'unhandledrejection'" type="primary"
+            @click="revertCode(scope.row)">查看源码</el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" prop="recordScreenId" label="播放录屏" width="100">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.recordScreenId" type="primary" @click="playRecord(scope.row.recordScreenId)">播放录屏</el-button>
+          <el-button v-if="scope.row.recordScreenId" type="primary"
+            @click="playRecord(scope.row.recordScreenId)">播放录屏</el-button>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" prop="breadcrumb" label="用户行为记录" width="125">
+      <el-table-column fixed="right" prop="breadcrumbs" label="用户行为记录" width="125">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.breadcrumb" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
+          <el-button v-if="scope.row.breadcrumbs" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen" :visible.sync="revertdialog" width="90%" :destroy-on-close="true">
+    <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen"
+      :visible.sync="revertdialog" width="90%" :destroy-on-close="true">
       <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
       <el-timeline v-else>
-        <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon" :color="activity.color" :timestamp="format(activity.time)">
+        <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
+          :color="activity.color" :timestamp="format(activity.time)">
           {{ activity.content }}
         </el-timeline-item>
       </el-timeline>
@@ -116,7 +120,7 @@ export default {
         fetch(`http://localhost:8083/getErrorList`)
           .then((response) => response.json())
           .then((res) => {
-            this.tableData = res.data;
+            this.tableData = res.data.list;
           });
       }, 500);
     },
@@ -131,11 +135,11 @@ export default {
           this.getTableData();
         });
     },
-    revertBehavior({ breadcrumb }) {
+    revertBehavior({ breadcrumbs }) {
       this.dialogTitle = '查看用户行为';
       this.fullscreen = false;
       this.revertdialog = true;
-      breadcrumb.forEach((item) => {
+      breadcrumbs.forEach((item) => {
         item.color = item.status == 'ok' ? '#5FF713' : '#F70B0B';
         item.icon = item.status == 'ok' ? 'el-icon-check' : 'el-icon-close';
         if (item.category == 'Click') {
@@ -150,7 +154,7 @@ export default {
           item.content = `路由变化：从 ${item.data.from}页面 切换到 ${item.data.to}页面`;
         }
       });
-      this.activities = breadcrumb;
+      this.activities = breadcrumbs;
     },
     revertCode(row) {
       findCodeBySourceMap(row, (res) => {
@@ -240,7 +244,7 @@ export default {
         }
       };
       ajax.send();
-      ajax.addEventListener('loadend', () => {});
+      ajax.addEventListener('loadend', () => { });
     }
   }
 };
@@ -253,43 +257,54 @@ export default {
   font-weight: 800;
   background-color: #ebeef5;
 }
+
 .el-row {
   text-align: left;
   margin-bottom: 10px;
 }
+
 .el-dialog__header {
   font-size: 20px;
   font-weight: 800;
 }
+
 .el-timeline {
   text-align: left;
+
   .el-timeline-item__icon {
     font-size: 12px;
   }
 }
+
 .revert-disalog {
   .el-dialog__body {
     height: 720px;
   }
 }
+
 .rr-player {
   margin: 0 auto;
 }
+
 #revert {
   width: 100%;
   display: flex;
 }
+
 .errdetail {
   text-align: left;
   width: 100%;
   font-size: 16px;
 }
+
 .code-line {
   padding: 5px 0;
 }
+
 .heightlight {
   background-color: yellowgreen;
 }
+
 .errheader {
   padding: 10px;
   border-bottom: 1px solid rgb(214, 210, 210);
