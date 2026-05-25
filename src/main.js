@@ -12,7 +12,7 @@ import recordscreen from "@websee/recordscreen";
 
 Vue.use(webSee, {
   dsn: "http://localhost:8083/reportData",
-  apikey: "abcd",
+  apikey: "bbd026ecf55e4511b00a901634bcb67b",
   silentWhiteScreen: true, // 开启白屏检测
   skeletonProject: true, // 项目有骨架屏
   repeatCodeError: true, // 开启错误上报去重

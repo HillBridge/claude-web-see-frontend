@@ -40,6 +40,11 @@ const routes = [
     path: '/about',
     name: 'about',
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+  },
+  {
+    path: '/projects',
+    name: 'projects',
+    component: () => import(/* webpackChunkName: "projects" */ '../views/ProjectsView.vue')
   }
 ];
 
@@ -47,7 +52,7 @@ const router = new VueRouter({
   routes
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const isLoggedIn = !!localStorage.getItem('auth-token');
   if (!to.meta.public && !isLoggedIn) {
     next({ name: 'login' });
