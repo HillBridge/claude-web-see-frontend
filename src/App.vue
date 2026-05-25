@@ -115,4 +115,11 @@ export default {
 * {
   margin: 0;
 }
+
+.el-table {
+  td.el-table__cell,
+  th.el-table__cell.is-leaf {
+    font-size: 14px;
+  }
+}
 </style>

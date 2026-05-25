@@ -270,13 +270,13 @@ export default {
 
   .apikey-text {
     font-family: monospace;
-    font-size: 12px;
+    font-size: 14px;
     color: #606266;
   }
 
   .text-muted {
     color: #c0c4cc;
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
@@ -287,7 +287,7 @@ export default {
 
   .origin-hint {
     margin-top: 6px;
-    font-size: 12px;
+    font-size: 14px;
     color: #c0c4cc;
   }
 }
