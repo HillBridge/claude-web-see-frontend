@@ -7,6 +7,8 @@
     "test": "concurrently  \"npm run serve\" \"npm run start\"",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:prod": "vue-cli-service build && node scripts/upload-sourcemaps.js",
+    "upload:sourcemaps": "node scripts/upload-sourcemaps.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -46,6 +48,7 @@
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "dotenv": "^17.4.2",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "sass": "^1.32.7",
