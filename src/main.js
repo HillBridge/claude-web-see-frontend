@@ -11,7 +11,7 @@ import performance from "@websee/performance";
 import recordscreen from "@websee/recordscreen";
 
 Vue.use(webSee, {
-  dsn: `${process.env.VUE_APP_BACKEND_URL || 'http://localhost:8083'}/reportData`,
+  dsn: `${process.env.VUE_APP_BACKEND_URL}/reportData`,
   apikey: "bbd026ecf55e4511b00a901634bcb67b",
   silentWhiteScreen: true, // 开启白屏检测
   skeletonProject: true, // 项目有骨架屏

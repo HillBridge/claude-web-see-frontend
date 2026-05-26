@@ -1,7 +1,7 @@
 const { defineConfig } = require('@vue/cli-service');
 const { PerfseePlugin } = require('@perfsee/webpack')
 
-const BACKEND_URL = process.env.VUE_APP_BACKEND_URL || 'http://localhost:8083';
+const BACKEND_URL = process.env.VUE_APP_BACKEND_URL;
 
 module.exports = defineConfig({
   devServer: {

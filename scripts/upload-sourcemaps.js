@@ -6,7 +6,7 @@
  *   node scripts/upload-sourcemaps.js
  *
  * 依赖环境变量（可放在 .env.upload 或 CI/CD secrets）:
- *   BACKEND_URL            后端地址，默认 http://localhost:8083（.env 中配置为 VUE_APP_BACKEND_URL）
+ *   BACKEND_URL            后端地址（.env 中配置为 VUE_APP_BACKEND_URL）
  *   SOURCEMAP_UPLOAD_SECRET 与后端 .env 中同名变量保持一致
  *   UPLOAD_APIKEY          项目 apikey
  */
@@ -22,7 +22,7 @@ if (fs.existsSync(envFile)) {
   require('dotenv').config({ path: envFile });
 }
 
-const BACKEND_URL = process.env.VUE_APP_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:8083';
+const BACKEND_URL = process.env.VUE_APP_BACKEND_URL || process.env.BACKEND_URL;
 const SECRET      = process.env.SOURCEMAP_UPLOAD_SECRET;
 const APIKEY      = process.env.UPLOAD_APIKEY;
 const DIST_DIR    = path.join(__dirname, '../dist/js');
