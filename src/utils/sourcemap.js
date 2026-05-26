@@ -13,10 +13,11 @@ function repalceAll(str) {
 
 function loadSourceMap(fileName) {
   let file = matchStr(fileName);
-  console.log("file", file);
   if (!file) return;
   return new Promise((resolve) => {
-    fetch(`${process.env.VUE_APP_BACKEND_URL}/getmap?fileName=${file}&apikey=${process.env.VUE_APP_APIKEY}`).then((response) => {
+    fetch(
+      `${process.env.VUE_APP_BACKEND_URL}/getmap?fileName=${file}&apikey=${process.env.VUE_APP_APIKEY}`,
+    ).then((response) => {
       resolve(response.json());
     });
   });
@@ -26,7 +27,6 @@ export const findCodeBySourceMap = async (
   { fileName, line, column },
   callback,
 ) => {
-  console.log("fileName", fileName);
   let sourceData = await loadSourceMap(fileName);
   if (!sourceData) return;
   let { sourcesContent, sources } = sourceData;

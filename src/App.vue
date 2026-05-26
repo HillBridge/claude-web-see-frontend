@@ -120,6 +120,11 @@ export default {
   td.el-table__cell,
   th.el-table__cell.is-leaf {
     font-size: 14px;
+
+    .cell,
+    .cell * {
+      font-size: 14px;
+    }
   }
 }
 </style>

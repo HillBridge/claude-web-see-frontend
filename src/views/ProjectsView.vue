@@ -34,11 +34,13 @@
       <el-table-column prop="createdAt" label="创建时间" width="160">
         <template slot-scope="{ row }">{{ formatDate(row.createdAt) }}</template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="210">
+      <el-table-column fixed="right" label="操作" width="220">
         <template slot-scope="{ row }">
-          <el-button type="primary" size="mini" @click="openEdit(row)">编辑</el-button>
-          <el-button type="warning" size="mini" @click="handleRegenerate(row)">重置Key</el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
+          <div style="display:flex; gap:4px; flex-wrap:nowrap">
+            <el-button type="primary" size="mini" @click="openEdit(row)">编辑</el-button>
+            <el-button type="warning" size="mini" @click="handleRegenerate(row)">重置Key</el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(row)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>

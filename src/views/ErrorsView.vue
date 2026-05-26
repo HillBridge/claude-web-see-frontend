@@ -23,65 +23,36 @@
           <span>{{ scope.row.deviceInfo.os }}</span>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="100">
+      <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="120">
         <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.type == 'error' || scope.row.type == 'unhandledrejection'"
-            type="primary"
-            @click="revertCode(scope.row)"
-          >查看源码</el-button>
+          <el-button v-if="scope.row.type == 'error' || scope.row.type == 'unhandledrejection'" type="primary"
+            @click="revertCode(scope.row)">查看源码</el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" prop="recordScreenId" label="播放录屏" width="100">
         <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.recordScreenId"
-            type="primary"
-            @click="playRecord(scope.row.recordScreenId)"
-          >播放录屏</el-button>
+          <el-button v-if="scope.row.recordScreenId" type="primary"
+            @click="playRecord(scope.row.recordScreenId)">播放录屏</el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" prop="breadcrumbs" label="用户行为记录" width="125">
         <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.breadcrumbs"
-            type="primary"
-            @click="revertBehavior(scope.row)"
-          >查看用户行为</el-button>
+          <el-button v-if="scope.row.breadcrumbs" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      style="margin-top: 16px; text-align: right"
-      background
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      :page-size="pageSize"
-      :page-sizes="[10, 20, 50, 100]"
-      :current-page="currentPage"
-      @current-change="handlePageChange"
-      @size-change="handleSizeChange"
-    ></el-pagination>
+    <el-pagination style="margin-top: 16px; text-align: right" background
+      layout="total, sizes, prev, pager, next, jumper" :total="total" :page-size="pageSize"
+      :page-sizes="[10, 20, 50, 100]" :current-page="currentPage" @current-change="handlePageChange"
+      @size-change="handleSizeChange"></el-pagination>
 
-    <el-dialog
-      :title="dialogTitle"
-      :class="{ 'revert-disalog': fullscreen }"
-      top="10vh"
-      :fullscreen="fullscreen"
-      :visible.sync="revertdialog"
-      width="90%"
-      :destroy-on-close="true"
-    >
+    <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen"
+      :visible.sync="revertdialog" width="90%" :destroy-on-close="true">
       <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
       <el-timeline v-else>
-        <el-timeline-item
-          v-for="(activity, index) in activities"
-          :key="index"
-          :icon="activity.icon"
-          :color="activity.color"
-          :timestamp="format(activity.time)"
-        >{{ activity.content }}</el-timeline-item>
+        <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
+          :color="activity.color" :timestamp="format(activity.time)">{{ activity.content }}</el-timeline-item>
       </el-timeline>
     </el-dialog>
   </div>
@@ -171,29 +142,29 @@ export default {
     },
     playRecord(id) {
       request.get(`/getRecordScreenId?id=${id}`).then((res) => {
-          let { code, data } = res;
-          if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
-            let events = unzip(data[0].events);
-            this.fullscreen = true;
-            this.dialogTitle = '播放录屏';
-            this.revertdialog = true;
-            this.$nextTick(() => {
-              new rrwebPlayer({
-                target: document.getElementById('revert'),
-                props: {
-                  events,
-                  UNSAFE_replayCanvas: true
-                }
-              });
+        let { code, data } = res;
+        if (code == 200 && Array.isArray(data) && data[0] && data[0].events) {
+          let events = unzip(data[0].events);
+          this.fullscreen = true;
+          this.dialogTitle = '播放录屏';
+          this.revertdialog = true;
+          this.$nextTick(() => {
+            new rrwebPlayer({
+              target: document.getElementById('revert'),
+              props: {
+                events,
+                UNSAFE_replayCanvas: true
+              }
             });
-          } else {
-            this.$message({
-              message: '暂无数据，请稍后重试~',
-              type: 'warning',
-              duration: 5000
-            });
-          }
-        });
+          });
+        } else {
+          this.$message({
+            message: '暂无数据，请稍后重试~',
+            type: 'warning',
+            duration: 5000
+          });
+        }
+      });
     },
     format(time) {
       let str = new Date(time);
