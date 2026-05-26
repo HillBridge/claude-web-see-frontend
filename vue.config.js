@@ -1,21 +1,23 @@
 const { defineConfig } = require('@vue/cli-service');
 const { PerfseePlugin } = require('@perfsee/webpack')
 
+const BACKEND_URL = process.env.VUE_APP_BACKEND_URL || 'http://localhost:8083';
+
 module.exports = defineConfig({
   devServer: {
     proxy: {
       '/getErrorList': {
-        target: 'http://localhost:8083/',
+        target: BACKEND_URL,
         changeOrigin: false, //  target是域名的话，需要这个参数，
         secure: false //  设置支持https协议的代理,
       },
       '/getmap': {
-        target: 'http://localhost:8083/',
+        target: BACKEND_URL,
         changeOrigin: false,
         secure: false
       },
       '/getmgetRecordScreenIdp': {
-        target: 'http://localhost:8083/',
+        target: BACKEND_URL,
         changeOrigin: false,
         secure: false
       }

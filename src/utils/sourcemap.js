@@ -16,7 +16,7 @@ function loadSourceMap(fileName) {
   let file = matchStr(fileName);
   if (!file) return;
   return new Promise((resolve) => {
-    fetch(`http://localhost:8083/getmap?fileName=${file}`).then((response) => {
+    fetch(`${process.env.VUE_APP_BACKEND_URL || 'http://localhost:8083'}/getmap?fileName=${file}`).then((response) => {
       resolve(response.json());
     });
   });
