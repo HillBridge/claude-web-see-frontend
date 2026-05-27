@@ -131,6 +131,7 @@ export default {
       this.activities = breadcrumbs;
     },
     revertCode(row) {
+      console.log("revertCode", row)
       findCodeBySourceMap(row, (res) => {
         this.dialogTitle = '查看源码';
         this.fullscreen = false;

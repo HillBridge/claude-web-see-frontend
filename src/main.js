@@ -20,7 +20,6 @@ Vue.use(webSee, {
   silentFetch: true, // 监听fetch请求报错
   beforeDataReport(data) {
     const userId = localStorage.getItem("auth-user-id");
-    console.log("beforeDataReport", userId);
     if (userId) data.userId = userId;
     return Promise.resolve(data);
   },

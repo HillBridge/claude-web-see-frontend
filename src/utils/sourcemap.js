@@ -64,7 +64,6 @@ export const findCodeBySourceMap = async (
     );
     index = copySources.indexOf(result.source);
   }
-  console.log("index", index);
   if (index === -1) {
     return Message({
       type: "error",
