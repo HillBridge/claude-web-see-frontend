@@ -34,7 +34,7 @@
       <el-table-column prop="createdAt" label="创建时间" width="160">
         <template slot-scope="{ row }">{{ formatDate(row.createdAt) }}</template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="220">
+      <el-table-column fixed="right" label="操作" width="240">
         <template slot-scope="{ row }">
           <div style="display:flex; gap:4px; flex-wrap:nowrap">
             <el-button type="primary" size="mini" @click="openEdit(row)">编辑</el-button>
