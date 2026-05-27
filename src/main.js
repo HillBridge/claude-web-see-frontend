@@ -18,7 +18,12 @@ Vue.use(webSee, {
   repeatCodeError: true, // 开启错误上报去重
   silentXhr: true, // 监听xhr请求报错
   silentFetch: true, // 监听fetch请求报错
-  userId: "123",
+  beforeDataReport(data) {
+    const userId = localStorage.getItem("auth-user-id");
+    console.log("beforeDataReport", userId);
+    if (userId) data.userId = userId;
+    return Promise.resolve(data);
+  },
   handleHttpStatus(data) {
     let { url, response } = data;
     // code为200，接口正常，反之亦然

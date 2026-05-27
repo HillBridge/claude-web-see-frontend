@@ -53,6 +53,7 @@ export default {
           .then((data) => {
             if (data.code === 200) {
               localStorage.setItem('auth-token', data.data?.accessToken || 'logged_in');
+              localStorage.setItem('auth-user-id', data.data?.user?.id)
               this.$message({ type: 'success', message: '登录成功，正在跳转…', duration: 1500 });
               setTimeout(() => {
                 this.$router.push('/');

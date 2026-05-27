@@ -28,11 +28,12 @@ export default {
         .then(() => {
           request.post('/api/auth/logout').finally(() => {
             localStorage.removeItem('auth-token');
+            localStorage.removeItem('auth-user-id');
             this.$router.push('/login');
             this.$message({ type: 'success', message: '已退出登录' });
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }
 };
@@ -117,6 +118,7 @@ export default {
 }
 
 .el-table {
+
   td.el-table__cell,
   th.el-table__cell.is-leaf {
     font-size: 14px;
