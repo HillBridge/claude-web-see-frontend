@@ -12,6 +12,11 @@
       </el-table-column>
       <el-table-column prop="apikey" label="项目编号"></el-table-column>
       <el-table-column prop="userId" label="用户id"></el-table-column>
+      <el-table-column prop="type" label="错误类型" width="160">
+        <template slot-scope="scope">
+          <el-tag :type="errorTagType(scope.row.type)" size="small">{{ errorTagLabel(scope.row.type) }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="环境信息" width="160">
         <template slot-scope="scope">
           <div>SDK: {{ scope.row.sdkVersion }}</div>
@@ -161,6 +166,24 @@ export default {
           });
         }
       });
+    },
+    errorTagType(type) {
+      const map = {
+        error: 'danger',
+        unhandledrejection: 'warning',
+        resource: 'info',
+        http: ''
+      };
+      return map[type] ?? 'info';
+    },
+    errorTagLabel(type) {
+      const map = {
+        error: 'JS错误',
+        unhandledrejection: 'Promise错误',
+        resource: '资源错误',
+        http: '请求错误'
+      };
+      return map[type] ?? type;
     },
     format(time) {
       let str = new Date(time);
