@@ -12,15 +12,11 @@
       </el-table-column>
       <el-table-column prop="apikey" label="项目编号"></el-table-column>
       <el-table-column prop="userId" label="用户id"></el-table-column>
-      <el-table-column prop="sdkVersion" label="SDK版本"></el-table-column>
-      <el-table-column prop="deviceInfo" label="浏览器信息">
+      <el-table-column label="环境信息" width="160">
         <template slot-scope="scope">
-          <span>{{ scope.row.deviceInfo.browser }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="deviceInfo" label="操作系统">
-        <template slot-scope="scope">
-          <span>{{ scope.row.deviceInfo.os }}</span>
+          <div>SDK: {{ scope.row.sdkVersion }}</div>
+          <div>{{ scope.row.deviceInfo.browser }}</div>
+          <div>{{ scope.row.deviceInfo.os }}</div>
         </template>
       </el-table-column>
       <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="120">
@@ -131,7 +127,6 @@ export default {
       this.activities = breadcrumbs;
     },
     revertCode(row) {
-      console.log("revertCode", row)
       findCodeBySourceMap(row, (res) => {
         this.dialogTitle = '查看源码';
         this.fullscreen = false;
