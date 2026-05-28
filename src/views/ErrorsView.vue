@@ -118,7 +118,7 @@ export default {
         projectId: '',
         type: '',
         userId: '',
-        timeRange: [new Date().setHours(0, 0, 0, 0), Date.now()]
+        timeRange: [Date.now() - 7 * 24 * 3600 * 1000, Date.now()]
       },
       timePickerOptions: {
         shortcuts: [
