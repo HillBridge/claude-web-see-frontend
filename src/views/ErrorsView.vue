@@ -26,6 +26,7 @@
           start-placeholder="开始时间"
           end-placeholder="结束时间"
           value-format="timestamp"
+          :picker-options="timePickerOptions"
           style="width: 360px"
         ></el-date-picker>
       </el-form-item>
@@ -117,7 +118,53 @@ export default {
         projectId: '',
         type: '',
         userId: '',
-        timeRange: null
+        timeRange: [new Date().setHours(0, 0, 0, 0), Date.now()]
+      },
+      timePickerOptions: {
+        shortcuts: [
+          {
+            text: '今天',
+            onClick(picker) {
+              picker.$emit('pick', [new Date().setHours(0, 0, 0, 0), Date.now()]);
+            }
+          },
+          {
+            text: '昨天',
+            onClick(picker) {
+              const start = new Date();
+              start.setDate(start.getDate() - 1);
+              start.setHours(0, 0, 0, 0);
+              const end = new Date();
+              end.setDate(end.getDate() - 1);
+              end.setHours(23, 59, 59, 999);
+              picker.$emit('pick', [start, end]);
+            }
+          },
+          {
+            text: '最近一周',
+            onClick(picker) {
+              const end = Date.now();
+              const start = end - 7 * 24 * 3600 * 1000;
+              picker.$emit('pick', [start, end]);
+            }
+          },
+          {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = Date.now();
+              const start = end - 30 * 24 * 3600 * 1000;
+              picker.$emit('pick', [start, end]);
+            }
+          },
+          {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = Date.now();
+              const start = end - 90 * 24 * 3600 * 1000;
+              picker.$emit('pick', [start, end]);
+            }
+          }
+        ]
       }
     };
   },
@@ -163,7 +210,7 @@ export default {
       this.getTableData();
     },
     handleReset() {
-      this.filters = { projectId: '', type: '', userId: '', timeRange: null };
+      this.filters = { projectId: '', type: '', userId: '', timeRange: [new Date().setHours(0, 0, 0, 0), Date.now()] };
       this.currentPage = 1;
       this.getTableData();
     },
