@@ -1,6 +1,40 @@
 <template>
   <div class="errors-view">
     <h2 class="page-title">报错统计</h2>
+
+    <el-form :inline="true" :model="filters" class="filter-form" @submit.native.prevent="handleSearch">
+      <el-form-item label="项目编号">
+        <el-input v-model="filters.projectId" placeholder="请输入项目编号" clearable style="width: 140px"></el-input>
+      </el-form-item>
+      <el-form-item label="错误类型">
+        <el-select v-model="filters.type" placeholder="全部" clearable style="width: 130px">
+          <el-option label="JS错误" value="error"></el-option>
+          <el-option label="Promise错误" value="unhandledrejection"></el-option>
+          <el-option label="资源错误" value="resource"></el-option>
+          <el-option label="Fetch请求错误" value="fetch"></el-option>
+          <el-option label="XHR请求错误" value="xhr"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户ID">
+        <el-input v-model="filters.userId" placeholder="请输入用户ID" clearable style="width: 140px"></el-input>
+      </el-form-item>
+      <el-form-item label="报错时间">
+        <el-date-picker
+          v-model="filters.timeRange"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
+          value-format="timestamp"
+          style="width: 360px"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
+      </el-form-item>
+    </el-form>
+
     <el-table :data="tableData" v-loading="loading" style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="message" label="报错信息" width="300"></el-table-column>
@@ -78,7 +112,13 @@ export default {
       total: 0,
       currentPage: 1,
       pageSize: 20,
-      loading: false
+      loading: false,
+      filters: {
+        projectId: '',
+        type: '',
+        userId: '',
+        timeRange: null
+      }
     };
   },
   created() {
@@ -87,10 +127,18 @@ export default {
   methods: {
     getTableData() {
       this.loading = true;
-      const params = new URLSearchParams({
+      const query = {
         page: this.currentPage,
         pageSize: this.pageSize
-      });
+      };
+      if (this.filters.projectId) query.projectId = this.filters.projectId;
+      if (this.filters.type) query.type = this.filters.type;
+      if (this.filters.userId) query.userId = this.filters.userId;
+      if (this.filters.timeRange) {
+        query.startTime = this.filters.timeRange[0];
+        query.endTime = this.filters.timeRange[1];
+      }
+      const params = new URLSearchParams(query);
       request
         .get(`/getErrorList?${params}`)
         .then((res) => {
@@ -107,6 +155,15 @@ export default {
     },
     handleSizeChange(size) {
       this.pageSize = size;
+      this.currentPage = 1;
+      this.getTableData();
+    },
+    handleSearch() {
+      this.currentPage = 1;
+      this.getTableData();
+    },
+    handleReset() {
+      this.filters = { projectId: '', type: '', userId: '', timeRange: null };
       this.currentPage = 1;
       this.getTableData();
     },
@@ -172,7 +229,8 @@ export default {
         error: 'danger',
         unhandledrejection: 'warning',
         resource: 'info',
-        http: ''
+        fetch: '',
+        xhr: ''
       };
       return map[type] ?? 'info';
     },
@@ -181,7 +239,8 @@ export default {
         error: 'JS错误',
         unhandledrejection: 'Promise错误',
         resource: '资源错误',
-        http: '请求错误'
+        fetch: 'Fetch请求错误',
+        xhr: 'XHR请求错误'
       };
       return map[type] ?? type;
     },
@@ -196,6 +255,13 @@ export default {
 <style lang="less">
 .errors-view {
   padding: 20px 0;
+
+  .filter-form {
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 0;
+  }
 
   .page-title {
     text-align: left;
