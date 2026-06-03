@@ -87,7 +87,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`上传 ${maps.length} 个 source map → ${BACKEND_URL} (apikey=${APIKEY})`);
+  // 脱敏 apikey,避免明文打进 CI 日志
+  const maskedKey = APIKEY ? `${APIKEY.slice(0, 4)}****${APIKEY.slice(-4)}` : '(未设置)';
+  console.log(`上传 ${maps.length} 个 source map → ${BACKEND_URL} (apikey=${maskedKey})`);
   for (const f of maps) {
     await uploadFile(path.join(DIST_DIR, f));
   }
