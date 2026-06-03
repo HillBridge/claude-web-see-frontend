@@ -11,6 +11,21 @@ function repalceAll(str) {
   return str.replace(new RegExp(" ", "gm"), "&nbsp;");
 }
 
+// HTML 转义,防止源码内容/路径中的标签注入到 innerHTML 造成 XSS
+function escapeHtml(str) {
+  return String(str ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c],
+  );
+}
+
 function loadSourceMap(fileName) {
   let file = matchStr(fileName);
   if (!file) return;
@@ -83,15 +98,15 @@ export const findCodeBySourceMap = async (
     j++;
     newLines.push(
       `<div class="code-line ${i + 1 == row ? "heightlight" : ""}" title="${
-        i + 1 == row ? result.source : ""
-      }">${j}. ${repalceAll(codeList[i])}</div>`,
+        i + 1 == row ? escapeHtml(result.source) : ""
+      }">${j}. ${repalceAll(escapeHtml(codeList[i]))}</div>`,
     );
   }
 
-  let innerHTML = `<div class="errdetail"><div class="errheader">${
-    result.source
-  } at line ${result.column}:${row}</div><div class="errdetail">${newLines.join(
-    "",
-  )}</div></div>`;
+  let innerHTML = `<div class="errdetail"><div class="errheader">${escapeHtml(
+    result.source,
+  )} at line ${escapeHtml(result.column)}:${escapeHtml(
+    row,
+  )}</div><div class="errdetail">${newLines.join("")}</div></div>`;
   callback(innerHTML);
 };
