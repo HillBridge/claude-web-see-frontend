@@ -52,6 +52,21 @@
           <el-tag :type="errorTagType(scope.row.type)" size="small">{{ errorTagLabel(scope.row.type) }}</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="count" label="发生次数" width="100" align="center">
+        <template slot-scope="scope">
+          <el-tag type="danger" size="small">{{ scope.row.count || 1 }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="firstSeen" label="首次出现" width="150">
+        <template slot-scope="scope">
+          <span>{{ scope.row.firstSeen ? format(scope.row.firstSeen) : '-' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="lastSeen" label="最近出现" width="150">
+        <template slot-scope="scope">
+          <span>{{ scope.row.lastSeen ? format(scope.row.lastSeen) : '-' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="环境信息" width="160">
         <template slot-scope="scope">
           <div>SDK: {{ scope.row.sdkVersion }}</div>
