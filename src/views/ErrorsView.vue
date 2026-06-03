@@ -99,7 +99,7 @@
       @size-change="handleSizeChange"></el-pagination>
 
     <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen"
-      :visible.sync="revertdialog" width="90%" :destroy-on-close="true">
+      :visible.sync="revertdialog" width="90%" :destroy-on-close="true" @close="handleDialogClose">
       <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
       <el-timeline v-else>
         <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
@@ -123,6 +123,7 @@ export default {
       fullscreen: true,
       revertdialog: false,
       dialogTitle: '',
+      player: null,
       activities: [],
       tableData: [],
       total: 0,
@@ -269,7 +270,8 @@ export default {
           this.dialogTitle = '播放录屏';
           this.revertdialog = true;
           this.$nextTick(() => {
-            new rrwebPlayer({
+            this.destroyPlayer();
+            this.player = new rrwebPlayer({
               target: document.getElementById('revert'),
               props: {
                 events,
@@ -285,6 +287,25 @@ export default {
           });
         }
       });
+    },
+    // 销毁回放器实例, 避免弹窗关闭后回放循环继续操作已移除的 DOM (Node not found / replayer destroyed 告警)
+    destroyPlayer() {
+      if (!this.player) return;
+      // 先暂停内部回放循环, 再销毁 Svelte 组件; 各步骤独立 try, 互不影响
+      try {
+        this.player.pause();
+      } catch (e) {
+        /* ignore */
+      }
+      try {
+        this.player.$destroy();
+      } catch (e) {
+        /* ignore */
+      }
+      this.player = null;
+    },
+    handleDialogClose() {
+      this.destroyPlayer();
     },
     errorTagType(type) {
       const map = {
