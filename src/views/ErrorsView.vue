@@ -91,6 +91,11 @@
           <el-button v-if="scope.row.breadcrumbs" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
         </template>
       </el-table-column>
+      <el-table-column fixed="right" label="操作" width="90">
+        <template slot-scope="scope">
+          <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-pagination style="margin-top: 16px; text-align: right" background
@@ -113,6 +118,7 @@
 import { findCodeBySourceMap } from '../utils/sourcemap';
 import { unzip } from '../utils/recordScreen.js';
 import request from '../utils/request';
+import { errorsApi } from '../api/errors';
 import rrwebPlayer from 'rrweb-player';
 import 'rrweb-player/dist/style.css';
 
@@ -229,6 +235,33 @@ export default {
       this.filters = { projectId: '', type: '', userId: '', timeRange: [new Date().setHours(0, 0, 0, 0), Date.now()] };
       this.currentPage = 1;
       this.getTableData();
+    },
+    handleDelete(row) {
+      this.$confirm('确认删除该错误？将一并删除其全部发生记录、录屏、用户行为数据，删除后无法恢复。', '警告', {
+        type: 'warning',
+        confirmButtonText: '确认删除',
+        confirmButtonClass: 'el-button--danger'
+      })
+        .then(() => {
+          this.loading = true;
+          errorsApi
+            .removeGroup(row.groupId)
+            .then(() => {
+              this.$message({ type: 'success', message: '已删除' });
+              // 删除当前页最后一条时回退一页, 避免停留在空页
+              if (this.tableData.length === 1 && this.currentPage > 1) {
+                this.currentPage -= 1;
+              }
+              this.getTableData();
+            })
+            .catch(() => {
+              this.$message({ type: 'error', message: '删除失败' });
+            })
+            .finally(() => {
+              this.loading = false;
+            });
+        })
+        .catch(() => {});
     },
     revertBehavior({ breadcrumbs }) {
       this.dialogTitle = '查看用户行为';
