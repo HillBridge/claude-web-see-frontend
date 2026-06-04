@@ -246,7 +246,12 @@ export default {
           this.loading = true;
           errorsApi
             .removeGroup(row.groupId)
-            .then(() => {
+            .then((res) => {
+              // 后端异常(如 404)仍以 HTTP 200 包裹返回，需根据业务 code 判定是否真正删除成功
+              if (res && res.code !== 200) {
+                this.$message({ type: 'error', message: res.message || '删除失败' });
+                return;
+              }
               this.$message({ type: 'success', message: '已删除' });
               // 删除当前页最后一条时回退一页, 避免停留在空页
               if (this.tableData.length === 1 && this.currentPage > 1) {
