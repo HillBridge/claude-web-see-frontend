@@ -8,6 +8,9 @@
       <el-button type="info" @click="xhrError">xhr请求报错</el-button>
       <el-button type="warning" @click="fetchError">fetch请求报错</el-button>
       <el-button type="danger" @click="resourceError">加载资源报错</el-button>
+      <el-button type="info" @click="postError">POST请求报错</el-button>
+      <el-button type="warning" @click="patchError">PATCH请求报错</el-button>
+      <el-button type="danger" @click="deleteError">DELETE请求报错</el-button>
     </div>
     <p class="tip">触发错误后，前往 <router-link to="/errors">报错统计</router-link> 页面查看结果。</p>
   </div>
@@ -49,6 +52,30 @@ export default {
       ajax.open('GET', 'https://abc.com/test/api');
       ajax.setRequestHeader('content-type', 'application/json');
       ajax.send();
+    },
+    // 以下三个用于演示 POST / PATCH / DELETE 的网络请求错误收集。
+    // 目标 https://api.github.com/<未知路径> 对所有方法稳定返回 404 且带 JSON 响应体、支持 CORS,
+    // 因此能被 web-see 的 httpTransform 判为请求失败(Status>=400)并上报,
+    // 同时保留请求参数(requestData)与响应体(response), 在「报错统计」的「请求详情」中可见。
+    postError() {
+      fetch('https://api.github.com/web-see/post-error', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'create', name: 'web-see-demo' })
+      }).catch(() => {});
+    },
+    patchError() {
+      let ajax = new XMLHttpRequest();
+      ajax.open('PATCH', 'https://api.github.com/web-see/patch-error');
+      ajax.setRequestHeader('content-type', 'application/json');
+      ajax.send(JSON.stringify({ action: 'update', id: 1, name: 'web-see-demo' }));
+    },
+    deleteError() {
+      fetch('https://api.github.com/web-see/delete-error', {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id: 1 })
+      }).catch(() => {});
     }
   }
 };
