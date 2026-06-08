@@ -91,6 +91,12 @@
           <el-button v-if="scope.row.breadcrumbs" type="primary" @click="revertBehavior(scope.row)">查看用户行为</el-button>
         </template>
       </el-table-column>
+      <el-table-column fixed="right" label="网络请求详情" width="120">
+        <template slot-scope="scope">
+          <el-button v-if="hasHttpDetail(scope.row)" type="primary" size="mini"
+            @click="showHttpDetail(scope.row)">请求详情</el-button>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="操作" width="90">
         <template slot-scope="scope">
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)">删除</el-button>
@@ -105,11 +111,20 @@
 
     <el-dialog :title="dialogTitle" :class="{ 'revert-disalog': fullscreen }" top="10vh" :fullscreen="fullscreen"
       :visible.sync="revertdialog" width="90%" :destroy-on-close="true" @close="handleDialogClose">
-      <div id="revert" ref="revert" v-if="dialogTitle != '查看用户行为'"></div>
-      <el-timeline v-else>
+      <el-timeline v-if="dialogTitle === '查看用户行为'">
         <el-timeline-item v-for="(activity, index) in activities" :key="index" :icon="activity.icon"
           :color="activity.color" :timestamp="format(activity.time)">{{ activity.content }}</el-timeline-item>
       </el-timeline>
+      <div v-else-if="dialogTitle === '网络请求详情'" class="http-detail">
+        <div class="http-detail__row"><span class="k">请求方式</span><span class="v">{{ httpDetail.requestMethod || '-' }}</span></div>
+        <div class="http-detail__row"><span class="k">请求类型</span><span class="v">{{ httpDetail.httpType || '-' }}</span></div>
+        <div class="http-detail__row"><span class="k">请求地址</span><span class="v">{{ httpDetail.requestUrl || '-' }}</span></div>
+        <div class="http-detail__row"><span class="k">响应状态码</span><span class="v">{{ httpDetail.responseStatus != null ? httpDetail.responseStatus : '-' }}</span></div>
+        <div class="http-detail__row"><span class="k">请求耗时</span><span class="v">{{ httpDetail.elapsedTime != null ? httpDetail.elapsedTime + ' ms' : '-' }}</span></div>
+        <div class="http-detail__block"><div class="k">请求参数</div><pre class="v">{{ prettyBody(httpDetail.requestData) }}</pre></div>
+        <div class="http-detail__block"><div class="k">响应信息</div><pre class="v">{{ prettyBody(httpDetail.responseData) }}</pre></div>
+      </div>
+      <div id="revert" ref="revert" v-else></div>
     </el-dialog>
   </div>
 </template>
@@ -131,6 +146,7 @@ export default {
       dialogTitle: '',
       player: null,
       activities: [],
+      httpDetail: {},
       tableData: [],
       total: 0,
       currentPage: 1,
@@ -299,6 +315,25 @@ export default {
         });
       });
     },
+    // 是否为网络请求错误(携带请求/响应信息), 决定是否展示「请求详情」按钮
+    hasHttpDetail(row) {
+      return !!(row.requestUrl || row.requestMethod || row.responseStatus != null);
+    },
+    showHttpDetail(row) {
+      this.httpDetail = row;
+      this.dialogTitle = '网络请求详情';
+      this.fullscreen = false;
+      this.revertdialog = true;
+    },
+    // 请求参数/响应体后端以字符串存储, 若为 JSON 则美化缩进展示, 否则原样输出
+    prettyBody(body) {
+      if (body == null || body === '') return '-';
+      try {
+        return JSON.stringify(JSON.parse(body), null, 2);
+      } catch (e) {
+        return String(body);
+      }
+    },
     playRecord(id) {
       request.get(`/getRecordScreenId?id=${id}`).then((res) => {
         let { code, data } = res;
@@ -437,5 +472,46 @@ export default {
 .errheader {
   padding: 10px;
   border-bottom: 1px solid rgb(214, 210, 210);
+}
+
+.http-detail {
+  text-align: left;
+  font-size: 14px;
+
+  .http-detail__row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    .k {
+      flex: 0 0 100px;
+      color: #909399;
+    }
+
+    .v {
+      flex: 1;
+      word-break: break-all;
+    }
+  }
+
+  .http-detail__block {
+    padding: 8px 0;
+
+    .k {
+      color: #909399;
+      margin-bottom: 6px;
+    }
+
+    pre.v {
+      margin: 0;
+      padding: 12px;
+      background: #f5f7fa;
+      border-radius: 4px;
+      max-height: 320px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  }
 }
 </style>
