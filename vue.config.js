@@ -6,8 +6,16 @@ const BACKEND_URL = process.env.VUE_APP_BACKEND_URL;
 const PERFSEE_TOKEN = process.env.PERFSEE_TOKEN;
 
 module.exports = defineConfig({
-  // 不在生产包中输出 sourcemap(避免原始源码随静态站公开泄露)
-  productionSourceMap: false,
+  // 生产构建生成 sourcemap 供上传后端做源码还原。
+  // 配合下方 chainWebpack 改用 hidden-source-map:不在 JS 中注入 //# sourceMappingURL= 注释,
+  // 浏览器不会自动拉取;且 scripts/upload-sourcemaps.js 上传后会从 dist 删除 .map,
+  // 因此不会随静态站公开泄露源码。
+  productionSourceMap: true,
+  chainWebpack: (config) => {
+    if (process.env.NODE_ENV === 'production') {
+      config.devtool('hidden-source-map');
+    }
+  },
   devServer: {
     proxy: {
       '/getErrorList': {

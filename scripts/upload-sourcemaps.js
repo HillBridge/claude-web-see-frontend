@@ -93,7 +93,11 @@ async function main() {
   for (const f of maps) {
     await uploadFile(path.join(DIST_DIR, f));
   }
-  console.log('完成');
+  // 上传后从 dist 删除 .map, 避免源码随静态站公开泄露(与 vue.config.js 的 hidden-source-map 配套)
+  for (const f of maps) {
+    fs.unlinkSync(path.join(DIST_DIR, f));
+  }
+  console.log(`完成, 已从 dist 删除 ${maps.length} 个 .map`);
 }
 
 main().catch((e) => { console.error(e.message); process.exit(1); });

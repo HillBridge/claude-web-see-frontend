@@ -35,9 +35,32 @@ function loadSourceMap(fileName) {
     fetch(
       `${process.env.VUE_APP_BACKEND_URL}/getmap?fileName=${file}&apikey=${process.env.VUE_APP_APIKEY}`,
       token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
-    ).then((response) => {
-      resolve(response.json());
-    });
+    )
+      .then((response) => response.json())
+      .then((res) => {
+        // 后端统一返回 {code,message,data}; 兼容直接返回裸 map 的情况
+        const map = res && res.version ? res : res && res.code === 200 ? res.data : null;
+        if (map && map.version) {
+          resolve(map);
+        } else {
+          // map 不存在/鉴权失败时弹出后端提示, 避免把非 map 对象丢进 SourceMapConsumer 报 version 缺失
+          Message({
+            type: "error",
+            duration: 5000,
+            message:
+              (res && res.message) || "源码还原失败: 未获取到有效的 sourcemap",
+          });
+          resolve(null);
+        }
+      })
+      .catch(() => {
+        Message({
+          type: "error",
+          duration: 5000,
+          message: "源码还原失败: 请求 sourcemap 出错",
+        });
+        resolve(null);
+      });
   });
 }
 

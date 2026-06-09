@@ -70,8 +70,8 @@
       <el-table-column label="环境信息" width="160">
         <template slot-scope="scope">
           <div>SDK: {{ scope.row.sdkVersion }}</div>
-          <div>{{ scope.row.deviceInfo.browser }}</div>
-          <div>{{ scope.row.deviceInfo.os }}</div>
+          <div>{{ scope.row.deviceInfo ? scope.row.deviceInfo.browser : '-' }}</div>
+          <div>{{ scope.row.deviceInfo ? scope.row.deviceInfo.os : '-' }}</div>
         </template>
       </el-table-column>
       <el-table-column fixed="right" prop="recordScreenId" label="还原错误代码" width="120">
