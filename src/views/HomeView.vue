@@ -2,7 +2,7 @@
   <div class="home-view">
     <h2 class="page-title">前端监控 · 控制台</h2>
     <el-row :gutter="20" class="cards">
-      <el-col :span="8">
+      <el-col :span="6">
         <el-card shadow="hover" @click.native="$router.push('/errors')">
           <div class="card-content">
             <i class="el-icon-warning-outline card-icon error-icon"></i>
@@ -13,7 +13,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-card shadow="hover" @click.native="$router.push('/performance')">
           <div class="card-content">
             <i class="el-icon-data-line card-icon perf-icon"></i>
@@ -24,7 +24,18 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
+        <el-card shadow="hover" @click.native="$router.push('/logs')">
+          <div class="card-content">
+            <i class="el-icon-document card-icon logs-icon"></i>
+            <div>
+              <p class="card-label">系统日志</p>
+              <p class="card-desc">查看后端运行告警日志(管理员)</p>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
         <el-card shadow="hover" @click.native="$router.push('/test')">
           <div class="card-content">
             <i class="el-icon-magic-stick card-icon test-icon"></i>
@@ -83,6 +94,10 @@ export default {
 
     .perf-icon {
       color: #409eff;
+    }
+
+    .logs-icon {
+      color: #e6a23c;
     }
 
     .test-icon {
