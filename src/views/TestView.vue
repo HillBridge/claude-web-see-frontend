@@ -21,7 +21,7 @@ export default {
   name: 'TestView',
   methods: {
     fetchError() {
-      fetch('https://jsonplaceholder.typicode.com/posts/a').catch(() => {});
+      fetch('https://jsonplaceholder.typicode.com/posts/a').catch(() => { });
     },
     asyncError() {
       setTimeout(() => {
@@ -58,11 +58,15 @@ export default {
     // 因此能被 web-see 的 httpTransform 判为请求失败(Status>=400)并上报,
     // 同时保留请求参数(requestData)与响应体(response), 在「报错统计」的「请求详情」中可见。
     postError() {
-      fetch('https://api.github.com/web-see/post-error', {
+      fetch('https://tapi-dev.transfersmile.com/api/v1/login/google_code', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action: 'create', name: 'web-see-demo' })
-      }).catch(() => {});
+        body: JSON.stringify({
+          "username": "abai@qq.com",
+          "password": "12121212",
+          "code": "333333"
+        })
+      }).catch(() => { });
     },
     patchError() {
       let ajax = new XMLHttpRequest();
@@ -75,7 +79,7 @@ export default {
         method: 'DELETE',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ action: 'delete', id: 1 })
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 };
