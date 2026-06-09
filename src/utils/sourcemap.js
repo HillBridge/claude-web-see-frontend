@@ -30,8 +30,11 @@ function loadSourceMap(fileName) {
   let file = matchStr(fileName);
   if (!file) return;
   return new Promise((resolve) => {
+    // /getmap 已改为需 JWT 鉴权(源码还原走后台登录态),带上 token(与 request.js 注入逻辑一致)
+    const token = localStorage.getItem("auth-token");
     fetch(
       `${process.env.VUE_APP_BACKEND_URL}/getmap?fileName=${file}&apikey=${process.env.VUE_APP_APIKEY}`,
+      token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
     ).then((response) => {
       resolve(response.json());
     });
