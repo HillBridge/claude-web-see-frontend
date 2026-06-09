@@ -29,6 +29,13 @@ function escapeHtml(str) {
 function loadSourceMap(fileName) {
   let file = matchStr(fileName);
   if (!file) return;
+  // 开发环境直接读取 dev-server 内存中的独立 .map(vue.config.js dev 用 devtool=source-map),
+  // 不依赖后端 /getmap 上传, 改完代码热更新即可在本地"查看源码"
+  if (process.env.NODE_ENV === "development") {
+    return fetch(`/js/${file}.map`)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+  }
   return new Promise((resolve) => {
     // /getmap 已改为需 JWT 鉴权(源码还原走后台登录态),带上 token(与 request.js 注入逻辑一致)
     const token = localStorage.getItem("auth-token");

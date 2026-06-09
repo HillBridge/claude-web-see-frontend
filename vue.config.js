@@ -14,6 +14,10 @@ module.exports = defineConfig({
   chainWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
       config.devtool('hidden-source-map');
+    } else {
+      // dev 改用 source-map 生成独立 .map(dev-server 以 /js/xxx.js.map 提供),
+      // 配合 sourcemap.js 的 dev 分支可在本地直接"查看源码",无需上传后端
+      config.devtool('source-map');
     }
   },
   devServer: {
