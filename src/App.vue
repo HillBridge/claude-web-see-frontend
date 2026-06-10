@@ -8,7 +8,6 @@
         <router-link to="/errors">报错统计</router-link>
         <router-link to="/performance">性能监控</router-link>
         <router-link to="/projects">项目管理</router-link>
-        <router-link to="/logs">系统日志</router-link>
         <router-link to="/test">错误测试</router-link>
       </nav>
       <el-button class="logout-btn" type="text" icon="el-icon-switch-button" @click="logout">退出</el-button>
